@@ -3,7 +3,7 @@ package proj4
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"github.com/sfomuseum/go-epsg"
 )
 
 const (
@@ -13,23 +13,18 @@ const (
 
 type Projection string
 
-func NewProjectionFromString(name string) (Projection, error) {
-
-	name = strings.Replace(name, "epsg:", "", -1)
+func NewProjectionFromString(code string) (Projection, error) {
 
 	var p Projection
-	var err error
 
-	switch name {
-	case "4326":
-		p = EPSG_4326
-	case "2227":
-		p = EPSG_2227
-	default:
-		err = errors.New("Invalid or unsupported EPSG string")
+	def, ok := epsg.LookupString(code)
+
+	if !ok {
+		return p, errors.New("Invalid EPSG code")
 	}
 
-	return p, err
+	p = Projection(def)
+	return p, nil
 }
 
 type Projector interface {

@@ -9,8 +9,16 @@ import "C"
 
 import (
 	"fmt"
+	"github.com/sfomuseum/go-epsg"
 	"unsafe"
 )
+
+var epsg_4326 Projection
+
+func init() {
+	def, _ := epsg.Lookup(4326)
+	epsg_4326 = Projection(def)
+}
 
 type Proj4Error struct {
 	retval int
@@ -31,7 +39,7 @@ func NewProj4Projector() (Projector, error) {
 
 func (p *Proj4Projector) Convert(c *Coordinate, src Projection, dest Projection) (*Coordinate, error) {
 
-	if src == EPSG_4326 {
+	if src == epsg_4326 {
 		c = c.ToRadians()
 	}
 
@@ -70,7 +78,7 @@ func (p *Proj4Projector) Convert(c *Coordinate, src Projection, dest Projection)
 		Z: float64(ele),
 	}
 
-	if dest == EPSG_4326 {
+	if dest == epsg_4326 {
 		rsp = rsp.ToDegrees()
 	}
 
